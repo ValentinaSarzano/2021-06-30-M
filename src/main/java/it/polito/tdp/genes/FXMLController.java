@@ -5,6 +5,7 @@
 package it.polito.tdp.genes;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.genes.model.Model;
@@ -39,11 +40,32 @@ public class FXMLController {
     @FXML
     void doContaArchi(ActionEvent event) {
 
+    	double soglia = 0.0;
+    	try {
+    		soglia = Double.parseDouble(txtSoglia.getText());
+    	}catch(NumberFormatException e) {
+    		txtResult.appendText("ERRORE: La soglia inserita deve essere un valore compreso tra un minimo di " + this.model.getPesoMinimo() + " e un massimo di "+ this.model.getPesoMassimo()+"\n");
+    	    return;
+    	}
+    	txtResult.appendText("Soglia = " + soglia + " ---> " + "Maggiori " + this.model.contaArchiMaggiori(soglia) +", minori " + this.model.contaArchiMinori(soglia) + "\n");
+    	
+    	
     }
 
     @FXML
     void doRicerca(ActionEvent event) {
-
+        txtResult.clear();
+        double soglia = 0.0;
+     	try {
+     		soglia = Double.parseDouble(txtSoglia.getText());
+     	}catch(NumberFormatException e) {
+     		txtResult.appendText("ERRORE: La soglia inserita deve essere un valore compreso tra un minimo di " + this.model.getPesoMinimo() + " e un massimo di "+ this.model.getPesoMassimo()+"\n");
+     	    return;
+     	}
+        List<Integer> percorso = this.model.trovaPercorso(soglia);
+    	for(Integer chromosome: percorso) {
+    		txtResult.appendText(chromosome + "\n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -57,6 +79,13 @@ public class FXMLController {
 
 	public void setModel(Model model) {
 		this.model = model ;
+		this.model.creaGrafo();
 		
+		txtResult.appendText("Grafo creato!\n");
+    	txtResult.appendText("#VERTICI: "+ this.model.nVertici()+"\n");
+    	txtResult.appendText("#ARCHI: "+ this.model.nArchi()+"\n");
+		
+    	txtResult.appendText("Peso minimo = " + model.getPesoMinimo() + "\n");
+    	txtResult.appendText("Peso massimo = " + model.getPesoMassimo()+ "\n");
 	}
 }
