@@ -40,11 +40,11 @@ public class GenesDao {
 		}
 	}
 	
-
-	public List<Integer> getVertici() {
-		String sql ="SELECT DISTINCT chromosome "
-				+ "FROM genes "
-				+ "WHERE chromosome != 0";
+	public List<Integer> getVertici(){
+		String sql = "SELECT DISTINCT g.Chromosome "
+				+ "FROM genes g "
+				+ "WHERE g.Chromosome != 0 "
+				+ "ORDER BY g.Chromosome";
 		List<Integer> result = new ArrayList<>();
 		Connection conn = DBConnect.getConnection();
 
@@ -53,7 +53,8 @@ public class GenesDao {
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 
-				Integer chromosome = res.getInt("Chromosome");
+				Integer chromosome = res.getInt("g.Chromosome");
+			
 				result.add(chromosome);
 			}
 			res.close();
@@ -66,14 +67,13 @@ public class GenesDao {
 		}
 	}
 
-	public List<Adiacenza> getAdiacenze(){
-		String sql ="SELECT g1.Chromosome AS c1, g2.Chromosome as c2, i.GeneID1, i.GeneID2, SUM( DISTINCT i.Expression_Corr) AS peso "
+	public List<Adiacenza> getAdiacenza(){
+		String sql = "SELECT DISTINCT g1.Chromosome, g2.Chromosome, SUM(DISTINCT i.Expression_Corr) AS peso "
 				+ "FROM genes g1, genes g2, interactions i "
 				+ "WHERE g1.Chromosome != g2.Chromosome AND g1.Chromosome != 0 AND g2.Chromosome != 0 "
-				+ "AND g1.GeneID = i.GeneID1 AND i.GeneID2 = g2.GeneID "
+				+ "AND g1.GeneID = i.GeneID1 AND g2.GeneID = i.GeneID2 "
 				+ "GROUP BY g1.Chromosome, g2.Chromosome "
 				+ "ORDER BY g1.Chromosome, g2.Chromosome";
-		
 		List<Adiacenza> result = new ArrayList<>();
 		Connection conn = DBConnect.getConnection();
 
@@ -81,8 +81,9 @@ public class GenesDao {
 			PreparedStatement st = conn.prepareStatement(sql);
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
-				Adiacenza a = new Adiacenza(res.getInt("c1"), res.getInt("c2"), res.getDouble("peso"));
-			    result.add(a);
+
+				Adiacenza a= new Adiacenza(res.getInt("g1.Chromosome"), res.getInt("g2.Chromosome"), res.getDouble("peso"));
+				result.add(a);
 			}
 			res.close();
 			st.close();
@@ -93,5 +94,4 @@ public class GenesDao {
 			throw new RuntimeException("Database error", e) ;
 		}
 	}
-	
 }

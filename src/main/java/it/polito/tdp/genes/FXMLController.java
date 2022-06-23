@@ -5,6 +5,7 @@
 package it.polito.tdp.genes;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -40,32 +41,37 @@ public class FXMLController {
     @FXML
     void doContaArchi(ActionEvent event) {
 
-    	double soglia = 0.0;
+    	txtResult.clear();
+    	Double s = 0.0;
     	try {
-    		soglia = Double.parseDouble(txtSoglia.getText());
+    		s = Double.parseDouble(txtSoglia.getText());
     	}catch(NumberFormatException e) {
-    		txtResult.appendText("ERRORE: La soglia inserita deve essere un valore compreso tra un minimo di " + this.model.getPesoMinimo() + " e un massimo di "+ this.model.getPesoMassimo()+"\n");
+    		txtResult.appendText("ERRORE: Inserire un numero valido compreso tra il peso minimo (" + this.model.getPesoMin()+") e il peso massimo (" + this.model.getPesoMax() + ")!\n");
     	    return;
     	}
-    	txtResult.appendText("Soglia = " + soglia + " ---> " + "Maggiori " + this.model.contaArchiMaggiori(soglia) +", minori " + this.model.contaArchiMinori(soglia) + "\n");
-    	
-    	
+    	if(s < this.model.getPesoMin() || s > this.model.getPesoMax()) {
+    		txtResult.appendText("ERRORE: Inserire un numero valido compreso tra il peso minimo (" + this.model.getPesoMin()+") e il peso massimo (" + this.model.getPesoMax() + ")!\n");
+    	    return;
+    	} else {
+    		txtResult.appendText("Soglia: " + s + " ---> " + "Maggiori " + this.model.contaArchiMaggioriDi(s) + ", minori " + this.model.contaArchiMinoriDi(s) + "\n");
+    	}
     }
 
     @FXML
     void doRicerca(ActionEvent event) {
-        txtResult.clear();
-        double soglia = 0.0;
-     	try {
-     		soglia = Double.parseDouble(txtSoglia.getText());
-     	}catch(NumberFormatException e) {
-     		txtResult.appendText("ERRORE: La soglia inserita deve essere un valore compreso tra un minimo di " + this.model.getPesoMinimo() + " e un massimo di "+ this.model.getPesoMassimo()+"\n");
-     	    return;
-     	}
-        List<Integer> percorso = this.model.trovaPercorso(soglia);
-    	for(Integer chromosome: percorso) {
-    		txtResult.appendText(chromosome + "\n");
-    	}
+     txtResult.clear();
+     Double soglia = 0.0;
+ 	    try {
+ 		    soglia = Double.parseDouble(txtSoglia.getText());
+ 	    }catch(NumberFormatException e) {
+ 		    txtResult.appendText("ERRORE: Inserire un numero valido compreso tra il peso minimo (" + this.model.getPesoMin()+") e il peso massimo (" + this.model.getPesoMax() + ")!\n");
+ 	        return;
+ 	    }
+     List<Integer> percorso = new ArrayList<>(this.model.trovaPercorso(soglia));
+     txtResult.appendText("SEQUENZA DI CROMOSOMI DI LUNGHEZZA MASSIMA:\n");
+        for(Integer chromosome: percorso) {
+ 		   txtResult.appendText(chromosome + "\n");
+ 	    }
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -84,8 +90,7 @@ public class FXMLController {
 		txtResult.appendText("Grafo creato!\n");
     	txtResult.appendText("#VERTICI: "+ this.model.nVertici()+"\n");
     	txtResult.appendText("#ARCHI: "+ this.model.nArchi()+"\n");
-		
-    	txtResult.appendText("Peso minimo = " + model.getPesoMinimo() + "\n");
-    	txtResult.appendText("Peso massimo = " + model.getPesoMassimo()+ "\n");
+    	txtResult.appendText("Peso minimo = "+ this.model.getPesoMin() +"\n");
+    	txtResult.appendText("Peso massimo = "+ this.model.getPesoMax() +"\n");
 	}
 }

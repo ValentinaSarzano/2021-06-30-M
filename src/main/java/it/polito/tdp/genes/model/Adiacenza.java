@@ -1,12 +1,11 @@
 package it.polito.tdp.genes.model;
 
 public class Adiacenza {
-	
 	private Integer chromosome1;
 	private Integer chromosome2;
-	private double peso;
+	private Double peso;
 	
-	public Adiacenza(Integer chromosome1, Integer chromosome2, double peso) {
+	public Adiacenza(Integer chromosome1, Integer chromosome2, Double peso) {
 		super();
 		this.chromosome1 = chromosome1;
 		this.chromosome2 = chromosome2;
@@ -29,15 +28,13 @@ public class Adiacenza {
 		this.chromosome2 = chromosome2;
 	}
 
-	public double getPeso() {
+	public Double getPeso() {
 		return peso;
 	}
 
-	public void setPeso(double peso) {
+	public void setPeso(Double peso) {
 		this.peso = peso;
 	}
-	
-	
 	
 
 }

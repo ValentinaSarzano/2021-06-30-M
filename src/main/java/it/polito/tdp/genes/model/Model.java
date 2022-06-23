@@ -6,16 +6,17 @@ import java.util.List;
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.graph.SimpleDirectedWeightedGraph;
 
 import it.polito.tdp.genes.db.GenesDao;
 
 public class Model {
-	private Graph<Integer, DefaultWeightedEdge> grafo;
 	private GenesDao dao;
+	private Graph<Integer, DefaultWeightedEdge> grafo;
 	
 	private List<Integer> best;
-	private double pesoMax;
+	private Double pesoMax;
 	
 	public Model() {
 		super();
@@ -29,15 +30,15 @@ public class Model {
 		Graphs.addAllVertices(this.grafo, this.dao.getVertici());
 		
 		//Aggiunta archi
-		for(Adiacenza a: this.dao.getAdiacenze()) {
+		for(Adiacenza a: this.dao.getAdiacenza()) {
 			if(this.grafo.containsVertex(a.getChromosome1()) && this.grafo.containsVertex(a.getChromosome2())) {
-			Graphs.addEdgeWithVertices(this.grafo, a.getChromosome1(), a.getChromosome2(), a.getPeso());
-		    }
+				Graphs.addEdgeWithVertices(this.grafo, a.getChromosome1(), a.getChromosome2(), a.getPeso());
+			}
 		}
-		 System.out.println("Grafo creato!");
-		 System.out.println("#VERTICI: "+ this.grafo.vertexSet().size());
-		 System.out.println("#ARCHI: "+ this.grafo.edgeSet().size());
-		
+
+	    System.out.println("Grafo creato!");
+		System.out.println("#VERTICI: "+ this.grafo.vertexSet().size());
+		System.out.println("#ARCHI: "+ this.grafo.edgeSet().size());
 	}
 	
 	public int nVertici() {
@@ -47,9 +48,16 @@ public class Model {
 	public int nArchi() {
 		return this.grafo.edgeSet().size();
 	}
-
-	public double getPesoMinimo() {
-        double pesoMin = 10000000.0;
+	
+	public boolean grafoCreato() {
+		if(this.grafo == null)
+			return false;
+		else
+			return true;
+	}
+	
+	public Double getPesoMin() {
+		Double pesoMin = 10000.0;
 		for(DefaultWeightedEdge e: this.grafo.edgeSet()) {
 			if(this.grafo.getEdgeWeight(e) < pesoMin) {
 				pesoMin = this.grafo.getEdgeWeight(e);
@@ -58,76 +66,62 @@ public class Model {
 		return pesoMin;
 	}
 
-	public double getPesoMassimo() {
-	    double pesoMax = 0.0;
-			for(DefaultWeightedEdge e: this.grafo.edgeSet()) {
-				if(this.grafo.getEdgeWeight(e) > pesoMax) {
-					pesoMax = this.grafo.getEdgeWeight(e);
-				}
+	public Double getPesoMax() {
+		Double pesoMax = 0.0;
+		for(DefaultWeightedEdge e: this.grafo.edgeSet()) {
+			if(this.grafo.getEdgeWeight(e) > pesoMax) {
+				pesoMax = this.grafo.getEdgeWeight(e);
 			}
-			return pesoMax;
 		}
-
-	public int contaArchiMaggiori(double soglia) {
-		int n = 0;
+		return pesoMax;
+	}
+	
+	public int contaArchiMaggioriDi(Double soglia) {
+		int count = 0;
 		for(DefaultWeightedEdge e: this.grafo.edgeSet()) {
 			if(this.grafo.getEdgeWeight(e) > soglia) {
-				n++;
+				count++;
 			}
 		}
-		return n;
+		return count;
 	}
-
-	public int contaArchiMinori(double soglia) {
-		int n = 0;
+	
+	public int contaArchiMinoriDi(Double soglia) {
+		int count = 0;
 		for(DefaultWeightedEdge e: this.grafo.edgeSet()) {
 			if(this.grafo.getEdgeWeight(e) < soglia) {
-				n++;
+				count++;
 			}
 		}
-		return n;
+		return count;
 	}
-	
-	public List<Adiacenza> getArchiMaggiori(double soglia){
-		List<Adiacenza> result = new ArrayList<>();
-		
-		for(DefaultWeightedEdge e: this.grafo.edgeSet()) {
-			if(this.grafo.getEdgeWeight(e) > soglia) {
-				result.add(new Adiacenza(this.grafo.getEdgeSource(e), this.grafo.getEdgeTarget(e), this.grafo.getEdgeWeight(e)));
-				
-			}
-		}
-		return result;
-	}
-	
 	
 	//Trovare il piu lungo cammino di vertici composto esclusivamente 
 	//da archi con peso > soglia
 	public List<Integer> trovaPercorso(double soglia){
-		
+			
 		this.best = new ArrayList<>();
-		
+			
 		List<Integer> parziale = new ArrayList<>();
-		
+			
 		this.pesoMax = 0.0;
-		
+			
 		for(Integer v: this.grafo.vertexSet()) {
 			parziale.clear();
 			parziale.add(v);
 			cerca(parziale, soglia, 0.0);
 		}
-	
-		
 		return best;
-	
+		
 	}
 
 	private void cerca(List<Integer> parziale, double soglia, double peso) {
 
 		if(peso > pesoMax) {
-			this.best = new ArrayList<>(parziale);
-			pesoMax = peso;
+				this.best = new ArrayList<>(parziale);
+				pesoMax = peso;
 		}
+		
 		//Cicla sul gruppo di archi con peso maggiore della soglia
 		Integer ultimo = parziale.get(parziale.size()-1);
 		List<Integer> vicini = Graphs.neighborListOf(this.grafo, ultimo);
@@ -142,5 +136,4 @@ public class Model {
 			}
 		}
 	}
-	
 }
